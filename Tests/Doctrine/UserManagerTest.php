@@ -29,7 +29,7 @@ class UserManagerTest extends TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $repository;
 
-    public function setUp()
+    protected function setUp(): void
     {
         if (!interface_exists(ObjectManager::class)) {
             $this->markTestSkipped('"doctrine/persistence" ^1.3 has to be installed for this test to run.');

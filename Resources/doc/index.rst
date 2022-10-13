@@ -53,7 +53,7 @@ Require the bundle with composer:
 
 .. code-block:: bash
 
-    $ composer require friendsofsymfony/user-bundle "~2.0"
+    $ composer require friendsofsymfony/user-bundle "^3.0"
 
 Composer will install the bundle to your project's ``vendor/friendsofsymfony/user-bundle`` directory.
 If you encounter installation errors pointing at a lack of configuration parameters, such as ``The child node "db_driver" at path "fos_user" must be configured``, you should complete the configuration in Step 5 first and then re-run this step.
@@ -261,7 +261,7 @@ in your application:
     # app/config/security.yml
     security:
         encoders:
-            FOS\UserBundle\Model\UserInterface: bcrypt
+            FOS\UserBundle\Model\UserInterface: auto
 
         role_hierarchy:
             ROLE_ADMIN:       ROLE_USER
@@ -371,7 +371,7 @@ Only four configuration's nodes are required to use the bundle:
 .. note::
 
     FOSUserBundle uses a compiler pass to register mappings for the base
-    User and Group model classes with the object manager that you configured
+    User model classes with the object manager that you configured
     it to use. (Unless specified explicitly, this is the default manager
     of your doctrine configuration.)
 
@@ -448,7 +448,6 @@ The following documents are available:
     logging_by_username_or_email
     form_type
     emails
-    groups
     doctrine
     overriding_validation
     canonicalizer

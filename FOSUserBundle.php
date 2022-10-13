@@ -14,8 +14,9 @@ namespace FOS\UserBundle;
 use Doctrine\Bundle\CouchDBBundle\DependencyInjection\Compiler\DoctrineCouchDBMappingsPass;
 use Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\DoctrineOrmMappingsPass;
 use Doctrine\Bundle\MongoDBBundle\DependencyInjection\Compiler\DoctrineMongoDBMappingsPass;
-use FOS\UserBundle\DependencyInjection\Compiler\CheckForMailerPass;
 use FOS\UserBundle\DependencyInjection\Compiler\CheckForSessionPass;
+use FOS\UserBundle\DependencyInjection\Compiler\CheckForSwiftMailerPass;
+use FOS\UserBundle\DependencyInjection\Compiler\ConfigurePasswordHasherPass;
 use FOS\UserBundle\DependencyInjection\Compiler\InjectRememberMeServicesPass;
 use FOS\UserBundle\DependencyInjection\Compiler\InjectUserCheckerPass;
 use FOS\UserBundle\DependencyInjection\Compiler\ValidationPass;
@@ -33,11 +34,12 @@ class FOSUserBundle extends Bundle
     public function build(ContainerBuilder $container)
     {
         parent::build($container);
+        $container->addCompilerPass(new ConfigurePasswordHasherPass());
         $container->addCompilerPass(new ValidationPass());
         $container->addCompilerPass(new InjectUserCheckerPass());
         $container->addCompilerPass(new InjectRememberMeServicesPass());
         $container->addCompilerPass(new CheckForSessionPass());
-        $container->addCompilerPass(new CheckForMailerPass());
+        $container->addCompilerPass(new CheckForSwiftMailerPass());
 
         $this->addRegisterMappingsPass($container);
     }

@@ -23,7 +23,7 @@ class PasswordUpdaterTest extends TestCase
     private $updater;
     private $encoderFactory;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->encoderFactory = $this->getMockBuilder('Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface')->getMock();
 
@@ -54,6 +54,10 @@ class PasswordUpdaterTest extends TestCase
 
     public function testUpdatePasswordWithBCrypt()
     {
+        if (!class_exists('Symfony\Component\Security\Core\Encoder\BCryptPasswordEncoder')) {
+            $this->markTestSkipped('This test requires Symfony 4');
+        }
+
         $encoder = $this->getMockBuilder('Symfony\Component\Security\Core\Encoder\BCryptPasswordEncoder')
             ->disableOriginalConstructor()
             ->getMock();
@@ -77,12 +81,23 @@ class PasswordUpdaterTest extends TestCase
         $this->assertNull($user->getPlainPassword(), '->updatePassword() erases credentials');
     }
 
-    public function testDoesNotUpdateWithoutPlainPassword()
+    public function testDoesNotUpdateWithEmptyPlainPassword()
     {
         $user = new TestUser();
         $user->setPassword('hash');
 
         $user->setPlainPassword('');
+
+        $this->updater->hashPassword($user);
+        $this->assertSame('hash', $user->getPassword());
+    }
+
+    public function testDoesNotUpdateWithoutPlainPassword()
+    {
+        $user = new TestUser();
+        $user->setPassword('hash');
+
+        $user->setPlainPassword(null);
 
         $this->updater->hashPassword($user);
         $this->assertSame('hash', $user->getPassword());

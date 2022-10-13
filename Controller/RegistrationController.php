@@ -11,6 +11,7 @@
 
 namespace FOS\UserBundle\Controller;
 
+use FOS\UserBundle\CompatibilityUtil;
 use FOS\UserBundle\Event\FilterUserResponseEvent;
 use FOS\UserBundle\Event\FormEvent;
 use FOS\UserBundle\Event\GetResponseUserEvent;
@@ -19,14 +20,13 @@ use FOS\UserBundle\FOSUserEvents;
 use FOS\UserBundle\Model\UserInterface;
 use FOS\UserBundle\Model\UserManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\EventDispatcher\LegacyEventDispatcherProxy;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Controller managing the registration.
@@ -45,16 +45,13 @@ class RegistrationController extends AbstractController
 
     public function __construct(EventDispatcherInterface $eventDispatcher, FactoryInterface $formFactory, UserManagerInterface $userManager, TokenStorageInterface $tokenStorage)
     {
-        $this->eventDispatcher = LegacyEventDispatcherProxy::decorate($eventDispatcher);
+        $this->eventDispatcher = CompatibilityUtil::upgradeEventDispatcher($eventDispatcher);
         $this->formFactory = $formFactory;
         $this->userManager = $userManager;
         $this->tokenStorage = $tokenStorage;
     }
 
-    /**
-     * @return Response
-     */
-    public function registerAction(Request $request)
+    public function registerAction(Request $request): Response
     {
         $user = $this->userManager->createUser();
         $user->setEnabled(true);
@@ -104,7 +101,7 @@ class RegistrationController extends AbstractController
     /**
      * Tell the user to check their email provider.
      */
-    public function checkEmailAction(Request $request)
+    public function checkEmailAction(Request $request): Response
     {
         $email = $request->getSession()->get('fos_user_send_confirmation_email/email');
 
@@ -128,10 +125,8 @@ class RegistrationController extends AbstractController
      * Receive the confirmation token from user email provider, login the user.
      *
      * @param string $token
-     *
-     * @return Response
      */
-    public function confirmAction(Request $request, $token)
+    public function confirmAction(Request $request, $token): Response
     {
         $userManager = $this->userManager;
 
@@ -162,7 +157,7 @@ class RegistrationController extends AbstractController
     /**
      * Tell the user his account is now confirmed.
      */
-    public function confirmedAction(Request $request)
+    public function confirmedAction(Request $request): Response
     {
         $user = $this->getUser();
         if (!is_object($user) || !$user instanceof UserInterface) {
@@ -175,10 +170,7 @@ class RegistrationController extends AbstractController
         ]);
     }
 
-    /**
-     * @return string|null
-     */
-    private function getTargetUrlFromSession(SessionInterface $session)
+    private function getTargetUrlFromSession(SessionInterface $session): ?string
     {
         $key = sprintf('_security.%s.target_path', $this->tokenStorage->getToken()->getProviderKey());
 

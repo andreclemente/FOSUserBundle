@@ -1,9 +1,29 @@
 Changelog
 =========
 
+### 3.0.1 (2022-08-27)
+
+* Fixed the wiring of controllers to avoid a deprecation warning when using Twig.
+
+### 3.0.0 (2022-04-28)
+
+* [BC break] Change the base class of controllers to use the `AbstractController` (but extending the controllers is not officially supported anymore).
+* [BC break] Remove the group feature
+* [BC break] Change the base class for events to `Symfony\Contracts\EventDispatcher\Event` instead of `Symfony\Component\EventDispatcher\Event`
+* [BC break] Remove the `Symfony\Component\Security\Core\User\AdvancedUserInterface` methods from our `UserInterface`
+* [BC break] The ResettingListener now longer blocks password resetting requests based on the `isAccountNonLocked` method of the `AdvancedUserInterface`. Projects customizing `isAccountNonLocked` for that purpose should instead register their own listener for the `FOSUserEvents::RESETTING_RESET_REQUEST` event to set a response instead of processing the request.
+* [BC break] Made `\FOS\UserBundle\Model\User::serialize` and `\FOS\UserBundle\Model\User::unserialize` final. Child classes needing to extend the serialization must override `__serialize` and `__unserialize` instead.
+* [BC break] `\FOS\UserBundle\Event\GetResponseNullableUserEvent` no longer inherits from `\FOS\UserBundle\Event\GetResponseUserEvent` and `\FOS\UserBundle\Event\UserEvent` as that was breaking variance rules.
+* [BC break] A few methods of `FOS\UserBundle\Model\User` now have return types (in methods where Symfony 6 requires them)
+* [BC break] The legacy mailer based on SwiftMailer and symfony/templating is no longer used by default. Selecting a mailer service is now mandatory when using a feature needing the mailer.
+* [BC break] Remove the legacy mailer based on SwiftMailer and symfony/templating. Use `fos_user.mailer.twig_swift` or a custom mailer service.
+* Add support for Symfony 5.
+* Add return types in most methods.
+* Add autowiring support for `FOS\UserBundle\Mailer\MailerInterface`
+
 ### 2.2.4 (2022-01-14)
 
-* Fixed a deprecated warning reported by DebugClassLoader in the AdvancedUserInterface BC layer due to the change done in 2.2.3.
+* Fixed a deprecation warning reported by DebugClassLoader in the AdvancedUserInterface BC layer due to the change done in 2.2.3.
 
 ### 2.2.3 (2022-01-14)
 

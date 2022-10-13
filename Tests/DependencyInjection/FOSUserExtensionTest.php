@@ -22,7 +22,7 @@ class FOSUserExtensionTest extends TestCase
     /** @var ContainerBuilder */
     protected $configuration;
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         $this->configuration = null;
     }
@@ -54,19 +54,6 @@ class FOSUserExtensionTest extends TestCase
         $loader = new FOSUserExtension();
         $config = $this->getEmptyConfig();
         unset($config['firewall_name']);
-        $loader->load([$config], new ContainerBuilder());
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testUserLoadThrowsExceptionUnlessGroupModelClassSet()
-    {
-        $this->expectException(InvalidConfigurationException::class);
-
-        $loader = new FOSUserExtension();
-        $config = $this->getFullConfig();
-        unset($config['group']['group_class']);
         $loader->load([$config], new ContainerBuilder());
     }
 
@@ -113,7 +100,7 @@ class FOSUserExtensionTest extends TestCase
         $loader->load([$config], $this->configuration);
         $this->assertNotHasDefinition('fos_user.registration.form.factory');
 
-        $mailer = $this->configuration->getDefinition('fos_user.mailer.default');
+        $mailer = $this->configuration->getDefinition('fos_user.mailer.twig_swift');
         $parameters = $this->configuration->getParameterBag()->resolveValue(
             $mailer->getArgument(3)
         );
@@ -135,7 +122,7 @@ class FOSUserExtensionTest extends TestCase
         $loader->load([$config], $this->configuration);
         $this->assertNotHasDefinition('fos_user.resetting.form.factory');
 
-        $mailer = $this->configuration->getDefinition('fos_user.mailer.default');
+        $mailer = $this->configuration->getDefinition('fos_user.mailer.twig_swift');
         $parameters = $this->configuration->getParameterBag()->resolveValue(
             $mailer->getArgument(3)
         );
@@ -238,16 +225,6 @@ class FOSUserExtensionTest extends TestCase
         $this->assertAlias('fos_user.user_manager.default', 'fos_user.user_manager');
     }
 
-    /**
-     * @group legacy
-     */
-    public function testLegacyUserLoadManagerClassWithDefaults()
-    {
-        $this->createEmptyConfiguration();
-
-        $this->assertNotHasDefinition('fos_user.group_manager');
-    }
-
     public function testUserLoadManagerClass()
     {
         $this->createFullConfiguration();
@@ -255,16 +232,6 @@ class FOSUserExtensionTest extends TestCase
         $this->assertParameter('orm', 'fos_user.storage');
         $this->assertParameter('custom', 'fos_user.model_manager_name');
         $this->assertAlias('acme_my.user_manager', 'fos_user.user_manager');
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testLegacyUserLoadManagerClass()
-    {
-        $this->createFullConfiguration();
-
-        $this->assertAlias('fos_user.group_manager.default', 'fos_user.group_manager');
     }
 
     public function testUserLoadFormClass()
@@ -275,16 +242,6 @@ class FOSUserExtensionTest extends TestCase
         $this->assertParameter('acme_my_registration', 'fos_user.registration.form.type');
         $this->assertParameter('acme_my_change_password', 'fos_user.change_password.form.type');
         $this->assertParameter('acme_my_resetting', 'fos_user.resetting.form.type');
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testLegacyUserLoadFormClass()
-    {
-        $this->createFullConfiguration();
-
-        $this->assertParameter('acme_my_group', 'fos_user.group.form.type');
     }
 
     public function testUserLoadFormNameWithDefaults()
@@ -307,16 +264,6 @@ class FOSUserExtensionTest extends TestCase
         $this->assertParameter('acme_resetting_form', 'fos_user.resetting.form.name');
     }
 
-    /**
-     * @group legacy
-     */
-    public function testLegacyUserLoadFormName()
-    {
-        $this->createFullConfiguration();
-
-        $this->assertParameter('acme_group_form', 'fos_user.group.form.name');
-    }
-
     public function testUserLoadFormServiceWithDefaults()
     {
         $this->createEmptyConfiguration();
@@ -327,16 +274,6 @@ class FOSUserExtensionTest extends TestCase
         $this->assertHasDefinition('fos_user.resetting.form.factory');
     }
 
-    /**
-     * @group legacy
-     */
-    public function testLegacyUserLoadFormServiceWithDefaults()
-    {
-        $this->createEmptyConfiguration();
-
-        $this->assertNotHasDefinition('fos_user.group.form.factory');
-    }
-
     public function testUserLoadFormService()
     {
         $this->createFullConfiguration();
@@ -345,16 +282,6 @@ class FOSUserExtensionTest extends TestCase
         $this->assertHasDefinition('fos_user.registration.form.factory');
         $this->assertHasDefinition('fos_user.change_password.form.factory');
         $this->assertHasDefinition('fos_user.resetting.form.factory');
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testLegacyUserLoadFormService()
-    {
-        $this->createFullConfiguration();
-
-        $this->assertHasDefinition('fos_user.group.form.factory');
     }
 
     public function testUserLoadConfirmationEmailWithDefaults()
@@ -385,7 +312,7 @@ class FOSUserExtensionTest extends TestCase
     {
         $this->createEmptyConfiguration();
 
-        $this->assertAlias('fos_user.mailer.default', 'fos_user.mailer');
+        $this->assertAlias('fos_user.mailer.noop', 'fos_user.mailer');
         $this->assertAlias('fos_user.util.canonicalizer.default', 'fos_user.util.email_canonicalizer');
         $this->assertAlias('fos_user.util.canonicalizer.default', 'fos_user.util.username_canonicalizer');
     }
@@ -431,16 +358,11 @@ class FOSUserExtensionTest extends TestCase
 
         $this->assertAlias($doctrineService, 'fos_user.doctrine_registry');
 
-        if (method_exists($definition, 'getFactory')) {
-            $factory = $definition->getFactory();
+        $factory = $definition->getFactory();
 
-            $this->assertInstanceOf('Symfony\Component\DependencyInjection\Reference', $factory[0]);
-            $this->assertSame('fos_user.doctrine_registry', (string) $factory[0]);
-            $this->assertSame('getManager', $factory[1]);
-        } else {
-            $this->assertSame('fos_user.doctrine_registry', $definition->getFactoryService());
-            $this->assertSame('getManager', $definition->getFactoryMethod());
-        }
+        $this->assertInstanceOf('Symfony\Component\DependencyInjection\Reference', $factory[0]);
+        $this->assertSame('fos_user.doctrine_registry', (string) $factory[0]);
+        $this->assertSame('getManager', $factory[1]);
     }
 
     /**
@@ -487,6 +409,8 @@ user_class: Acme\MyBundle\Document\User
 from_email:
     address: admin@acme.org
     sender_name: Acme Corp
+service:
+    mailer: fos_user.mailer.noop
 EOF;
         $parser = new Parser();
 
@@ -546,12 +470,6 @@ service:
     email_canonicalizer: acme_my.email_canonicalizer
     username_canonicalizer: acme_my.username_canonicalizer
     user_manager: acme_my.user_manager
-group:
-    group_class: Acme\MyBundle\Entity\Group
-    form:
-        type: acme_my_group
-        name: acme_group_form
-        validation_groups: [acme_group]
 EOF;
         $parser = new Parser();
 
@@ -581,7 +499,7 @@ EOF;
      */
     private function assertHasDefinition($id)
     {
-        $this->assertTrue(($this->configuration->hasDefinition($id) ?: $this->configuration->hasAlias($id)));
+        $this->assertTrue($this->configuration->hasDefinition($id) ?: $this->configuration->hasAlias($id));
     }
 
     /**
@@ -589,6 +507,6 @@ EOF;
      */
     private function assertNotHasDefinition($id)
     {
-        $this->assertFalse(($this->configuration->hasDefinition($id) ?: $this->configuration->hasAlias($id)));
+        $this->assertFalse($this->configuration->hasDefinition($id) ?: $this->configuration->hasAlias($id));
     }
 }
