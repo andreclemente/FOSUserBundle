@@ -21,7 +21,7 @@ use FOS\UserBundle\Form\Factory\FactoryInterface;
 use FOS\UserBundle\FOSUserEvents;
 use FOS\UserBundle\Model\GroupInterface;
 use FOS\UserBundle\Model\GroupManagerInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\LegacyEventDispatcherProxy;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -37,7 +37,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  *
  * @deprecated
  */
-class GroupController extends Controller
+class GroupController extends AbstractController
 {
     private $eventDispatcher;
     private $formFactory;
@@ -188,7 +188,7 @@ class GroupController extends Controller
     protected function findGroupBy($key, $value)
     {
         if (!empty($value)) {
-            $group = $this->groupManager->{'findGroupBy'.ucfirst($key)}($value);
+            $group = $this->groupManager->{'findGroupBy' . ucfirst($key)}($value);
         }
 
         if (empty($group)) {
