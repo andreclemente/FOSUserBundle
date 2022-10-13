@@ -11,8 +11,7 @@
 
 namespace FOS\UserBundle\Model;
 
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
+use Symfony\Component\Security\Core\User\EquatableInterface;
 use Symfony\Component\Security\Core\User\UserInterface as BaseUserInterface;
 
 /**
@@ -21,7 +20,7 @@ use Symfony\Component\Security\Core\User\UserInterface as BaseUserInterface;
  * @author Thibault Duplessis <thibault.duplessis@gmail.com>
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
-abstract class User implements UserInterface, GroupableInterface
+abstract class User implements UserInterface, EquatableInterface, \Serializable
 {
     /**
      * @var mixed
@@ -70,7 +69,7 @@ abstract class User implements UserInterface, GroupableInterface
     /**
      * Plain password. Used for model validation. Must not be persisted.
      *
-     * @var string
+     * @var string|null
      */
     protected $plainPassword;
 
@@ -118,29 +117,9 @@ abstract class User implements UserInterface, GroupableInterface
         return (string) $this->getUsername();
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function addRole($role)
+    public function __serialize(): array
     {
-        $role = strtoupper($role);
-        if ($role === static::ROLE_DEFAULT) {
-            return $this;
-        }
-
-        if (!in_array($role, $this->roles, true)) {
-            $this->roles[] = $role;
-        }
-
-        return $this;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function serialize()
-    {
-        return serialize([
+        return [
             $this->password,
             $this->salt,
             $this->usernameCanonical,
@@ -149,16 +128,11 @@ abstract class User implements UserInterface, GroupableInterface
             $this->id,
             $this->email,
             $this->emailCanonical,
-        ]);
+        ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function unserialize($serialized)
+    public function __unserialize(array $data): void
     {
-        $data = unserialize($serialized);
-
         if (13 === count($data)) {
             // Unserializing a User object from 1.3.x
             unset($data[4], $data[5], $data[6], $data[9], $data[10]);
@@ -182,6 +156,39 @@ abstract class User implements UserInterface, GroupableInterface
     }
 
     /**
+     * @internal
+     */
+    final public function serialize()
+    {
+        return serialize($this->__serialize());
+    }
+
+    /**
+     * @internal
+     */
+    final public function unserialize($serialized)
+    {
+        $this->__unserialize(unserialize($serialized));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function addRole($role)
+    {
+        $role = strtoupper($role);
+        if ($role === static::ROLE_DEFAULT) {
+            return $this;
+        }
+
+        if (!in_array($role, $this->roles, true)) {
+            $this->roles[] = $role;
+        }
+
+        return $this;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function eraseCredentials()
@@ -197,8 +204,15 @@ abstract class User implements UserInterface, GroupableInterface
         return $this->id;
     }
 
+    public function getUserIdentifier(): string
+    {
+        return $this->username;
+    }
+
     /**
      * {@inheritdoc}
+     *
+     * @return string
      */
     public function getUsername()
     {
@@ -216,7 +230,7 @@ abstract class User implements UserInterface, GroupableInterface
     /**
      * {@inheritdoc}
      */
-    public function getSalt()
+    public function getSalt(): ?string
     {
         return $this->salt;
     }
@@ -240,7 +254,7 @@ abstract class User implements UserInterface, GroupableInterface
     /**
      * {@inheritdoc}
      */
-    public function getPassword()
+    public function getPassword(): ?string
     {
         return $this->password;
     }
@@ -274,7 +288,7 @@ abstract class User implements UserInterface, GroupableInterface
     /**
      * {@inheritdoc}
      */
-    public function getRoles()
+    public function getRoles(): array
     {
         $roles = $this->roles;
 
@@ -294,30 +308,6 @@ abstract class User implements UserInterface, GroupableInterface
     public function hasRole($role)
     {
         return in_array(strtoupper($role), $this->getRoles(), true);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function isAccountNonExpired()
-    {
-        return true;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function isAccountNonLocked()
-    {
-        return true;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function isCredentialsNonExpired()
-    {
-        return true;
     }
 
     public function isEnabled()
@@ -486,7 +476,7 @@ abstract class User implements UserInterface, GroupableInterface
     public function isPasswordRequestNonExpired($ttl)
     {
         return $this->getPasswordRequestedAt() instanceof \DateTime &&
-               $this->getPasswordRequestedAt()->getTimestamp() + $ttl > time();
+            $this->getPasswordRequestedAt()->getTimestamp() + $ttl > time();
     }
 
     /**
@@ -559,7 +549,7 @@ abstract class User implements UserInterface, GroupableInterface
     /**
      * {@inheritdoc}
      */
-    public function isEqualTo(BaseUserInterface $user)
+    public function isEqualTo(BaseUserInterface $user): bool
     {
         if (!$user instanceof self) {
             return false;
