@@ -32,7 +32,7 @@ abstract class UserManager implements UserManagerInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @return UserInterface
      */
     public function createUser()
     {
@@ -43,7 +43,7 @@ abstract class UserManager implements UserManagerInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @return UserInterface|null
      */
     public function findUserByEmail($email)
     {
@@ -51,7 +51,7 @@ abstract class UserManager implements UserManagerInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @return UserInterface|null
      */
     public function findUserByUsername($username)
     {
@@ -59,7 +59,7 @@ abstract class UserManager implements UserManagerInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @return UserInterface|null
      */
     public function findUserByUsernameOrEmail($usernameOrEmail)
     {
@@ -74,7 +74,7 @@ abstract class UserManager implements UserManagerInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @return UserInterface|null
      */
     public function findUserByConfirmationToken($token)
     {
@@ -82,7 +82,7 @@ abstract class UserManager implements UserManagerInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @return void
      */
     public function updateCanonicalFields(UserInterface $user)
     {
@@ -90,7 +90,7 @@ abstract class UserManager implements UserManagerInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @return void
      */
     public function updatePassword(UserInterface $user)
     {

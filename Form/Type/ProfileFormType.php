@@ -37,10 +37,7 @@ class ProfileFormType extends AbstractType
         $this->class = $class;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $this->buildUserForm($builder, $options);
 
@@ -66,10 +63,7 @@ class ProfileFormType extends AbstractType
         ]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'data_class' => $this->class,
@@ -77,9 +71,6 @@ class ProfileFormType extends AbstractType
         ]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getBlockPrefix(): string
     {
         return 'fos_user_profile';
@@ -88,7 +79,7 @@ class ProfileFormType extends AbstractType
     /**
      * Builds the embedded form representing the user.
      */
-    protected function buildUserForm(FormBuilderInterface $builder, array $options)
+    protected function buildUserForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
             ->add('username', null, ['label' => 'form.username', 'translation_domain' => 'FOSUserBundle'])

@@ -1,6 +1,26 @@
 Changelog
 =========
 
+### 3.2.1 (2023-07-06)
+
+* Fixed remaining deprecations with Symfony 6.3
+
+### 3.2.0 (2023-07-06)
+
+* Fixed deprecations with Symfony 6.3
+* Fixed deprecations with Doctrine ORM (requires using DoctrineBundle 2.10.1 or newer for the fix to be effective)
+* Fixed the way to access the session when enabling confirmation emails
+* Fixed the way to access the firewall name when enabling the registration feature
+
+### 3.1.0 (2022-10-26)
+
+* Added support for Symfony 6
+
+### 3.0.2 (2022-10-26)
+
+* Fixed support for the remember-me in the programmatic login when using the new authentication system of Symfony.
+* Fixed some deprecations when using Symfony 5.4.
+
 ### 3.0.1 (2022-08-27)
 
 * Fixed the wiring of controllers to avoid a deprecation warning when using Twig.

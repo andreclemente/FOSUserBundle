@@ -12,35 +12,23 @@
 namespace FOS\UserBundle\Mailer;
 
 use FOS\UserBundle\Model\UserInterface;
+use Symfony\Component\Mailer\MailerInterface as SymfonyMailerInterface;
+use Symfony\Component\Mime\Address;
+use Symfony\Component\Mime\Email;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Twig\Environment;
 
 /**
  * @author Christophe Coevoet <stof@notk.org>
  */
-class TwigSwiftMailer implements MailerInterface
+final class TwigSymfonyMailer implements MailerInterface
 {
-    /**
-     * @var \Swift_Mailer
-     */
-    protected $mailer;
+    private SymfonyMailerInterface $mailer;
+    private UrlGeneratorInterface $router;
+    private Environment $twig;
+    private array $parameters;
 
-    /**
-     * @var UrlGeneratorInterface
-     */
-    protected $router;
-
-    /**
-     * @var Environment
-     */
-    protected $twig;
-
-    /**
-     * @var array
-     */
-    protected $parameters;
-
-    public function __construct(\Swift_Mailer $mailer, UrlGeneratorInterface $router, Environment $twig, array $parameters)
+    public function __construct(SymfonyMailerInterface $mailer, UrlGeneratorInterface $router, Environment $twig, array $parameters)
     {
         $this->mailer = $mailer;
         $this->router = $router;
@@ -48,10 +36,7 @@ class TwigSwiftMailer implements MailerInterface
         $this->parameters = $parameters;
     }
 
-    /**
-     * @return void
-     */
-    public function sendConfirmationEmailMessage(UserInterface $user)
+    public function sendConfirmationEmailMessage(UserInterface $user): void
     {
         $template = $this->parameters['template']['confirmation'];
         $url = $this->router->generate('fos_user_registration_confirm', ['token' => $user->getConfirmationToken()], UrlGeneratorInterface::ABSOLUTE_URL);
@@ -61,13 +46,10 @@ class TwigSwiftMailer implements MailerInterface
             'confirmationUrl' => $url,
         ];
 
-        $this->sendMessage($template, $context, $this->parameters['from_email']['confirmation'], (string) $user->getEmail());
+        $this->sendMessage($template, $context, $this->parameters['from_email']['confirmation'], $user->getEmail());
     }
 
-    /**
-     * @return void
-     */
-    public function sendResettingEmailMessage(UserInterface $user)
+    public function sendResettingEmailMessage(UserInterface $user): void
     {
         $template = $this->parameters['template']['resetting'];
         $url = $this->router->generate('fos_user_resetting_reset', ['token' => $user->getConfirmationToken()], UrlGeneratorInterface::ABSOLUTE_URL);
@@ -77,18 +59,14 @@ class TwigSwiftMailer implements MailerInterface
             'confirmationUrl' => $url,
         ];
 
-        $this->sendMessage($template, $context, $this->parameters['from_email']['resetting'], (string) $user->getEmail());
+        $this->sendMessage($template, $context, $this->parameters['from_email']['resetting'], $user->getEmail());
     }
 
     /**
-     * @param string $templateName
-     * @param array  $context
-     * @param array  $fromEmail
-     * @param string $toEmail
-     *
-     * @return void
+     * @param array<string, mixed>                        $context
+     * @param array{address: string, sender_name: string} $fromEmail
      */
-    protected function sendMessage($templateName, $context, $fromEmail, $toEmail)
+    private function sendMessage(string $templateName, array $context, array $fromEmail, string $toEmail): void
     {
         $template = $this->twig->load($templateName);
         $subject = $template->renderBlock('subject', $context);
@@ -100,16 +78,15 @@ class TwigSwiftMailer implements MailerInterface
             $htmlBody = $template->renderBlock('body_html', $context);
         }
 
-        $message = (new \Swift_Message())
-            ->setSubject($subject)
-            ->setFrom($fromEmail)
-            ->setTo($toEmail);
+        $message = (new Email())
+            ->subject($subject)
+            ->from(new Address($fromEmail['address'], $fromEmail['sender_name']))
+            ->to($toEmail)
+            ->text($textBody)
+        ;
 
         if (!empty($htmlBody)) {
-            $message->setBody($htmlBody, 'text/html')
-                ->addPart($textBody, 'text/plain');
-        } else {
-            $message->setBody($textBody);
+            $message->html($htmlBody);
         }
 
         $this->mailer->send($message);

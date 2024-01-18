@@ -91,9 +91,6 @@ abstract class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     protected $passwordRequestedAt;
 
-    /**
-     * @var GroupInterface[]|Collection
-     */
     protected $groups;
 
     /**
@@ -172,9 +169,6 @@ abstract class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->__unserialize(unserialize($serialized));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function addRole($role)
     {
         $role = strtoupper($role);
@@ -190,16 +184,13 @@ abstract class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @return void
      */
     public function eraseCredentials()
     {
         $this->plainPassword = null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getId()
     {
         return $this->id;
@@ -211,8 +202,6 @@ abstract class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return string
      */
     public function getUsername()
@@ -220,49 +209,31 @@ abstract class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->username;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getUsernameCanonical()
     {
         return $this->usernameCanonical;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getSalt(): ?string
     {
         return $this->salt;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getEmail()
     {
         return $this->email;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getEmailCanonical()
     {
         return $this->emailCanonical;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPassword(): ?string
     {
         return $this->password;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPlainPassword()
     {
         return $this->plainPassword;
@@ -278,17 +249,11 @@ abstract class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->lastLogin;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getConfirmationToken()
     {
         return $this->confirmationToken;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getRoles(): array
     {
         $roles = $this->roles;
@@ -303,9 +268,6 @@ abstract class User implements UserInterface, PasswordAuthenticatedUserInterface
         return array_values(array_unique($roles));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function hasRole($role)
     {
         return in_array(strtoupper($role), $this->getRoles(), true);
@@ -316,17 +278,11 @@ abstract class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->enabled;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isSuperAdmin()
     {
         return $this->hasRole(static::ROLE_SUPER_ADMIN);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function removeRole($role)
     {
         if (false !== $key = array_search(strtoupper($role), $this->roles, true)) {
@@ -337,9 +293,6 @@ abstract class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setUsername($username)
     {
         $this->username = $username;
@@ -347,9 +300,6 @@ abstract class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setUsernameCanonical($usernameCanonical)
     {
         $this->usernameCanonical = $usernameCanonical;
@@ -357,9 +307,6 @@ abstract class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setSalt($salt)
     {
         $this->salt = $salt;
@@ -367,9 +314,6 @@ abstract class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setEmail($email)
     {
         $this->email = $email;
@@ -377,9 +321,6 @@ abstract class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setEmailCanonical($emailCanonical)
     {
         $this->emailCanonical = $emailCanonical;
@@ -387,9 +328,6 @@ abstract class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setEnabled($boolean)
     {
         $this->enabled = (bool) $boolean;
@@ -397,9 +335,6 @@ abstract class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setPassword($password)
     {
         $this->password = $password;
@@ -407,9 +342,6 @@ abstract class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setSuperAdmin($boolean)
     {
         if (true === $boolean) {
@@ -421,9 +353,6 @@ abstract class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setPlainPassword($password)
     {
         $this->plainPassword = $password;
@@ -431,9 +360,6 @@ abstract class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setLastLogin(\DateTime $time = null)
     {
         $this->lastLogin = $time;
@@ -441,9 +367,6 @@ abstract class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setConfirmationToken($confirmationToken)
     {
         $this->confirmationToken = $confirmationToken;
@@ -451,9 +374,6 @@ abstract class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setPasswordRequestedAt(\DateTime $date = null)
     {
         $this->passwordRequestedAt = $date;
@@ -471,18 +391,12 @@ abstract class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->passwordRequestedAt;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isPasswordRequestNonExpired($ttl)
     {
-        return $this->getPasswordRequestedAt() instanceof \DateTime &&
-            $this->getPasswordRequestedAt()->getTimestamp() + $ttl > time();
+        return $this->getPasswordRequestedAt() instanceof \DateTime
+               && $this->getPasswordRequestedAt()->getTimestamp() + $ttl > time();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setRoles(array $roles)
     {
         $this->roles = [];
@@ -494,9 +408,6 @@ abstract class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getGroups()
     {
         return $this->groups ?: $this->groups = new ArrayCollection();

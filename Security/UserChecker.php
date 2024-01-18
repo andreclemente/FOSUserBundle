@@ -23,7 +23,7 @@ use Symfony\Component\Security\Core\User\UserInterface as BaseUserInterface;
 class UserChecker implements UserCheckerInterface
 {
     /**
-     * {@inheritdoc}
+     * @return void
      */
     public function checkPreAuth(BaseUserInterface $user)
     {
@@ -35,7 +35,7 @@ class UserChecker implements UserCheckerInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @return void
      */
     public function checkPostAuth(BaseUserInterface $user)
     {

@@ -44,7 +44,7 @@ class UserManager extends BaseUserManager
     }
 
     /**
-     * {@inheritdoc}
+     * @return void
      */
     public function deleteUser(UserInterface $user)
     {
@@ -53,7 +53,9 @@ class UserManager extends BaseUserManager
     }
 
     /**
-     * {@inheritdoc}
+     * @return string
+     *
+     * @phpstan-return class-string<UserInterface>
      */
     public function getClass()
     {
@@ -66,7 +68,7 @@ class UserManager extends BaseUserManager
     }
 
     /**
-     * {@inheritdoc}
+     * @return UserInterface|null
      */
     public function findUserBy(array $criteria)
     {
@@ -74,7 +76,7 @@ class UserManager extends BaseUserManager
     }
 
     /**
-     * {@inheritdoc}
+     * @return \Traversable<UserInterface>
      */
     public function findUsers()
     {
@@ -82,7 +84,7 @@ class UserManager extends BaseUserManager
     }
 
     /**
-     * {@inheritdoc}
+     * @return void
      */
     public function reloadUser(UserInterface $user)
     {
@@ -90,7 +92,7 @@ class UserManager extends BaseUserManager
     }
 
     /**
-     * {@inheritdoc}
+     * @return void
      */
     public function updateUser(UserInterface $user, $andFlush = true)
     {
@@ -104,7 +106,7 @@ class UserManager extends BaseUserManager
     }
 
     /**
-     * @return ObjectRepository
+     * @return ObjectRepository<UserInterface>
      */
     protected function getRepository()
     {

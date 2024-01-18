@@ -25,14 +25,12 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
  * @author Christophe Coevoet <stof@notk.org>
  *
  * @internal
+ *
  * @final
  */
 class Configuration implements ConfigurationInterface
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function getConfigTreeBuilder()
+    public function getConfigTreeBuilder(): TreeBuilder
     {
         $treeBuilder = new TreeBuilder('fos_user');
         $rootNode = $treeBuilder->getRootNode();
@@ -54,6 +52,7 @@ class Configuration implements ConfigurationInterface
                 ->scalarNode('firewall_name')->isRequired()->cannotBeEmpty()->end()
                 ->scalarNode('model_manager_name')->defaultNull()->end()
                 ->booleanNode('use_authentication_listener')->defaultTrue()->end()
+                ->booleanNode('register_last_login')->defaultTrue()->end()
                 ->booleanNode('use_listener')->defaultTrue()->end()
                 ->booleanNode('use_flash_notifications')->defaultTrue()->end()
                 ->booleanNode('use_username_form_type')->defaultTrue()->end()
@@ -89,7 +88,7 @@ class Configuration implements ConfigurationInterface
         return $treeBuilder;
     }
 
-    private function addProfileSection(ArrayNodeDefinition $node)
+    private function addProfileSection(ArrayNodeDefinition $node): void
     {
         $node
             ->children()
@@ -114,7 +113,7 @@ class Configuration implements ConfigurationInterface
             ->end();
     }
 
-    private function addRegistrationSection(ArrayNodeDefinition $node)
+    private function addRegistrationSection(ArrayNodeDefinition $node): void
     {
         $node
             ->children()
@@ -152,7 +151,7 @@ class Configuration implements ConfigurationInterface
             ->end();
     }
 
-    private function addResettingSection(ArrayNodeDefinition $node)
+    private function addResettingSection(ArrayNodeDefinition $node): void
     {
         $node
             ->children()
@@ -191,7 +190,7 @@ class Configuration implements ConfigurationInterface
             ->end();
     }
 
-    private function addChangePasswordSection(ArrayNodeDefinition $node)
+    private function addChangePasswordSection(ArrayNodeDefinition $node): void
     {
         $node
             ->children()
@@ -215,7 +214,7 @@ class Configuration implements ConfigurationInterface
             ->end();
     }
 
-    private function addServiceSection(ArrayNodeDefinition $node)
+    private function addServiceSection(ArrayNodeDefinition $node): void
     {
         $node
             ->addDefaultsIfNotSet()
@@ -223,7 +222,7 @@ class Configuration implements ConfigurationInterface
                 ->arrayNode('service')
                     ->addDefaultsIfNotSet()
                         ->children()
-                            ->scalarNode('mailer')->defaultValue('fos_user.mailer.default')->end()
+                            ->scalarNode('mailer')->defaultNull()->end()
                             ->scalarNode('email_canonicalizer')->defaultValue('fos_user.util.canonicalizer.default')->end()
                             ->scalarNode('token_generator')->defaultValue('fos_user.util.token_generator.default')->end()
                             ->scalarNode('username_canonicalizer')->defaultValue('fos_user.util.canonicalizer.default')->end()

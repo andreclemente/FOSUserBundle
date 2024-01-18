@@ -20,6 +20,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
  * @internal
+ *
  * @final
  */
 class ResettingListener implements EventSubscriberInterface
@@ -45,9 +46,6 @@ class ResettingListener implements EventSubscriberInterface
         $this->tokenTtl = $tokenTtl;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public static function getSubscribedEvents(): array
     {
         return [
